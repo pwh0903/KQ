@@ -1,0 +1,10 @@
+poker/*
+env/*
+.DS_Store
+.idea/*
+controls/*
+numbers/*
+postion/*
+cards/*
+*.pyc
+tmp/*
