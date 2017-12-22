@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from PIL import ImageGrab
+import subprocess
 import os
 import pyautogui
 import time
@@ -194,20 +194,47 @@ def get_control_window(full_window):
     return control_window
 
 
+def control_action(control, click_count=1):
+    control_map = {
+        'fold': (450, 565),
+        'call': (590, 565),
+        'check': (590, 565),
+        'raise': (720, 565),
+        'slider': (640, 520),
+        'min': (550, 488),
+        '3bb': (620, 488),
+        'half': (620, 488),
+        'pot': (690, 488),
+        'max': (750, 488),
+    }
+    row, col = control_map.get(control)
+    click_count = 2
+    pyautogui.click(row, col, clicks=click_count, interval=0.2)
+
+
+def make_controls(player_win, pot_money, control_list):
+    pass
+
+
 if __name__ == '__main__':
-    screenshot = 'tmp_screenshot.png'
+    print('Start new game...')
+
+    screenshot = 'tmp/tmp_screenshot.png'
+
     new_hand = True
+    len_board_cards_last_bet = 0
     hand_status = 'PREFLOP'
     player_postion_last = -1
 
-    player_money_start = 10000.0
-    player_money_last_hand = player_money_start
+    player_money_start = 10000
+    player_money_last_hand = -1
     player_money_last_bet = player_money_last_hand
     player_cards_last_hand = None
 
-    total_hand = 1.0
-    win_hand = 0.0
-    lose_hand = 0.0
+    total_hand = 0
+    win_hand = 0
+    lose_hand = 0
+    equal_hand = 0
 
     while True:
         os.system("screencapture -R 0,46,791,548 {}".format(screenshot))
@@ -218,29 +245,18 @@ if __name__ == '__main__':
         # get player's hand cards, money
         player_postion = get_player_postion(im)
         if player_postion < 0:
-            print('Wait for a new game')
-            time.sleep(2)
+            # print('Wait for a new game')
+            # time.sleep(2)
             continue
         player_window, player_money_window = get_player_window(im, player_postion)
         player_cards = get_card_list(player_window)
-        if len(player_cards) < 2 and new_hand == True:
-            print('Wait for a new hand')
-            time.sleep(2)
+        if len(player_cards) < 2 and new_hand:
+            # print('Wait for a new hand')
+            # time.sleep(10)
             continue
-        player_money = get_money(player_money_window)
+        player_cards_str = ''.join(player_cards)
 
-        # get board window from full screenshot
-        # get board cards, money
-        board_cards_window = im[int(31*h/96):int(39*h/96), int(w/3): int(2*w/3)]
-        board_cards = get_card_list(board_cards_window)
-        if len(board_cards) < 2:
-            hand_status = 'PREFlOP'
-        elif len(board_cards) == 3:
-            hand_status = 'FlOP'
-        elif len(board_cards) == 4:
-            hand_status = 'TURN'
-        elif len(board_cards) == 5:
-            hand_status = 'RIVER'
+        player_money = get_money(player_money_window)
 
         pot_window = im[int(148*h/543): int(165*h/543), int(650*w/1580): int(960*w/1580)]
         pot_money = get_money(pot_window)
@@ -248,33 +264,71 @@ if __name__ == '__main__':
         control_window = get_control_window(im)
         control_list = get_controls(control_window)
 
+        board_cards_window = im[int(31*h/96):int(39*h/96), int(w/3): int(2*w/3)]
+        board_cards = get_card_list(board_cards_window)
+
+        if new_hand:
+            if player_money_last_hand == -1:
+                total_hand -= 1
+            elif player_money < player_money_last_hand:
+                lose_hand += 1
+            elif player_money > player_money_last_hand:
+                win_hand += 1
+            else:
+                equal_hand += 1
+            total_hand += 1
+            print('==========New hand {}, win: {}, lose: {},equal: {}, profit: {}=========='.format(total_hand, win_hand,
+                                                                                                    lose_hand, equal_hand,
+                                                                                          player_money-player_money_start))
+            print('Money last hand: {}, money now: {}'.format(player_money_last_hand, player_money))
+            # save this hand's info as history, set new hand false
+            player_money_last_hand = player_money
+            player_cards_last_hand = player_cards
+            new_hand = False
+            pot_money_last_hand = pot_money
+
+        # # if can call, means someone raise bet
+        # if 'call' in control_list:
+        #     new_bet = True
+
+        # check if new bet and show control list
+        # if len(control_list) > 1 and new_bet:
         if len(control_list) > 1:
-            if player_money != player_money_last_hand and player_cards != player_cards_last_hand:
-                print('==========New hand {}, win: {}, lose: {}, profit: {}=========='.format(total_hand, win_hand, lose_hand,
-                                                                                              player_money-player_money_start))
-                player_money_last_hand = player_money
-                player_cards_last_hand = player_cards
-                new_hand = False
+            # get board window from full screenshot
+            # get board cards, money
+            if len(board_cards) < 2:
+                hand_status = 'PREFlOP'
+                # new_bet = False
+            elif len(board_cards) == 3:
+                hand_status = 'FlOP'
+                # new_bet = False
+            elif len(board_cards) == 4:
+                hand_status = 'TURN'
+                # new_bet = False
+            elif len(board_cards) == 5:
+                hand_status = 'RIVER'
+                # new_bet = False
+
             print('Player in postion {}'.format(player_postion))
             print('==============={}==============='.format(hand_status))
             print('Board Cards: {}'.format(board_cards))
             print('My cards: {}'.format(player_cards))
+            if len(board_cards) > 1:
+                board_cards_str = ''.join(board_cards)
+                print(player_cards_str, board_cards_str)
+                output = subprocess.check_output('ps-eval {} --board {}'.format(player_cards_str, board_cards_str), shell=True)
+                output = output.decode('utf-8')
+                player_win = float(output.split('\n')[0].split('%')[0].strip().split(' ')[-1])
+                other_win = float(output.split('\n')[1].split('%')[0].strip().split(' ')[-1])
+                print('My winning percentage: {}'.format(player_win))
             print('Pot money: {}'.format(pot_money))
             print('My money: {}'.format(player_money))
             print('Available controls: {}'.format(control_list))
 
+            make_controls(player_win, pot_money, control_list)
+            time.sleep(5)
+
         if len(player_cards) < 2:
-            new_hand += 1
             new_hand = True
 
-            if player_money:
-                if player_money < player_money_last_hand:
-                    lose_hand += 1
-                else:
-                    win_hand += 1
-            total_hand += 1
-
-            player_money_last_hand = player_money
-
-        time.sleep(2)
 
