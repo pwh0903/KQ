@@ -8,3 +8,5 @@ postion/*
 cards/*
 *.pyc
 tmp/*
+positions/
+tmp_screenshot.png

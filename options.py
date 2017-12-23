@@ -3,6 +3,45 @@ import numpy as np
 import os
 
 
+def cut_blank(im):
+    r_start = 0
+    for i in im:
+        if np.sum(i) == 0:
+            r_start += 1
+        else:
+            break
+
+    im = im[r_start:]
+
+    r_end = 0
+    for i in im:
+        if np.sum(i) != 0:
+            r_end += 1
+        else:
+            break
+
+    im = im[:r_end]
+
+    c_start = 0
+    for c in im.T:
+        if np.sum(c) == 0:
+            c_start += 1
+        else:
+            break
+    im = im[:, c_start:]
+
+    # c_end = 0
+    # for c in im.T[::-1]:
+    #     if np.sum(c) == 0:
+    #         c_end += 1
+    #     else:
+    #         break
+    # if c_end != 0:
+    #     im = im[:, :c_end]
+
+    return im
+
+
 # get options from option window
 def get_options(option_img):
     print(option_img.shape)
@@ -13,7 +52,7 @@ def get_options(option_img):
             continue
         file_name, file_extension = os.path.splitext(img)
         template = cv2.imread('controls/{}'.format(img), 0)
-        print(template.shape)
+        # print(template.shape)
         res = cv2.matchTemplate(option_img, template, cv2.TM_CCOEFF_NORMED)
         threshold = 0.7
         loc = np.where(res >= threshold)
@@ -23,43 +62,18 @@ def get_options(option_img):
     return options_list
 
 
-def get_card_list(cards_window):
-    cards_list = []
-    imgs = os.listdir('cards')
-    for img in imgs:
-        if not img.endswith('png'):
-            continue
-        file_name, file_extension = os.path.splitext(img)
-        template = cv2.imread('cards/{}'.format(img), 0)
-        res = cv2.matchTemplate(cards_window, template, cv2.TM_CCOEFF_NORMED)
-        threshold = 0.99
-        loc = np.where(res >= threshold)
-        row, col = loc
-        if len(row) > 0 and len(col) > 0:
-            start_c = 0
-            for c in col:
-                diff_c = c - start_c
-                if diff_c < 12:
-                    start_c = c
-                    continue
-                start_c = c
-            cards_list.append(file_name)
-    return cards_list
-
-
 if __name__ == '__main__':
     test_imgs = os.listdir('poker')
     for img in test_imgs:
-        if not img.endswith('png'):
+        if not img.endswith('.png'):
             continue
         im = cv2.imread('poker/{}'.format(img), 0)
-        control_window_start_h = 860
-        control_window_h = 320
-        control_window_start_w = 750
-        control_window_w = 820
-        control_window = im[control_window_start_h:control_window_start_h+control_window_h,
-                         control_window_start_w:control_window_start_w+control_window_w]
-        # option_window = cv2.imread('options.png', 0)
+        option_start_x = 145
+        option_start_y = 465
+        option_w = 510
+        option_h = 105
+        control_window = im[option_start_y:option_start_y+option_h, option_start_x:option_start_x+option_w]
+        ret, control_window = cv2.threshold(control_window, 95, 255, cv2.THRESH_BINARY)
         option_list = get_options(control_window)
         print(option_list)
         cv2.imshow('option_window', control_window)
@@ -67,30 +81,35 @@ if __name__ == '__main__':
         cv2.destroyAllWindows()
 
 # get option screenshot and save them
-# print(option_window.shape)
-# h, w = option_window.shape
+# im = cv2.imread('poker/1.png', 0)
+#
+# option_start_x = 145
+# option_start_y = 465
+# option_w = 510
+# option_h = 105
+#
+# option_window = im[option_start_y:option_start_y+option_h, option_start_x:option_start_x+option_w]
+#
+# print(type(im))
+# print(im.shape)
+#
+# cv2.imshow('option', option_window)
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
 
-# check = option_window[-int(h/2):-int(h/6), int(w/3):int(2*w/3)]
-# bet = option_window[-int(h/2):-int(h/4), int(2*w/3):]
-# half_pot = option_window[:int(h/5), int(w/2):int(2*w/3)]
-# fold = option_window[-int(h/2):-int(h/6), :int(w/3)]
-# call = option_window[-int(h/2):-int(h/4), int(w/3):int(2*w/3)]
-# raise_to = option_window[-int(h/2):-int(h/4), int(2*w/3):]
-# min_bet = option_window[:int(h/5), int(w/3):int(w/2)]
-# three_bet = option_window[:int(h/5), int(w/2):int(2*w/3)]
-# pot_bet = option_window[:int(h/5), int(2*w/3):int(5*w/6)]
-# max_bet = option_window[:int(h/5), int(5*w/6):]
-# slider = option_window[int(h/5):int(h/2), int(w/3):]
+# control_imgs = os.listdir('tmp')
+# print(control_imgs)
+# for img in control_imgs:
+#     if not img.endswith('.PNG'):
+#         continue
+#     im_name = img.strip('.PNG')
+#     im = cv2.imread('tmp/{}'.format(img), 0)
+#     ret, im = cv2.threshold(im, 95, 255, cv2.THRESH_BINARY)
+#     im = cut_blank(im)
+#     cv2.imwrite('controls/{}.png'.format(im_name), im)
+# cv2.write('controls/{}.png'.format(control_name))
 
-# cv2.imwrite('options/fold.png', fold)
-# cv2.imwrite('options/call.png', call)
-# cv2.imwrite('options/raise_to.png', raise_to)
-# cv2.imwrite('options/min_bet.png', min_bet)
-# cv2.imwrite('options/three_bet.png', three_bet)
-# cv2.imwrite('options/pot_bet.png', pot_bet)
-# cv2.imwrite('options/max_bet.png', max_bet)
-# cv2.imwrite('options/slider.png', slider)
-# cv2.imwrite('options/check.png', check)
-# cv2.imwrite('options/half_pot.png', half_pot)
-# cv2.imwrite('options/bet.png', bet)
-
+# print(im)
+# cv2.imshow('option', im)
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()

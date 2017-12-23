@@ -50,74 +50,6 @@ def get_card_list(cards_window):
     return cards_list
 
 
-def get_button_postion(full_window):
-    postion_folder = 'postion'
-    ret, full = cv2.threshold(full_window, 180, 255, cv2.THRESH_BINARY)
-    template = cv2.imread('{}/button.png'.format(postion_folder), 0)
-    res = cv2.matchTemplate(full, template, cv2.TM_CCOEFF_NORMED)
-    threshold = 0.9
-    h, w = np.where(res >= threshold)
-    if 880 < w < 980 and 640 < h < 710:
-        button_p = 0
-    elif 375 < w < 445 and 575 < h < 635:
-        button_p = 1
-    elif 480 < w < 560 and 620 < h < 680:
-        button_p = 1
-    elif 325 < w < 395 and 310 < h < 370:
-        button_p = 2
-    elif 270 < w < 350 and 380 < h < 460:
-        button_p = 2
-    elif 645 < w < 710 and 205 < h < 265:
-        button_p = 3
-    elif 335 < w < 405 and 305 < h < 375:
-        button_p = 3
-    elif 1215 < w < 1285 and 320 < h < 380:
-        button_p = 4
-    elif 545 < w < 615 and 220 < h < 280:
-        button_p = 4
-    elif 1145 < w < 1215 and 575 < h < 635:
-        button_p = 5
-    elif 1000 < w < 1080 and 220 < h < 280:
-        button_p = 5
-    elif 1190 < w < 1260 and 310 < h < 375:
-        button_p = 6
-    elif 1240 < w < 1320 and 380 < h < 450:
-        button_p = 7
-    elif 1050 < w < 1150 and 600 < h < 670:
-        button_p = 8
-    print(button_p)
-    return button_p
-
-
-def get_player_postion(full_window):
-    postion_folder = 'postion'
-    player_p = -1
-    ret, full = cv2.threshold(full_window, 70, 255, cv2.THRESH_BINARY)
-    template = cv2.imread('{}/me.png'.format(postion_folder), 0)
-    res = cv2.matchTemplate(full, template, cv2.TM_CCOEFF_NORMED)
-    threshold = 0.7
-    try:
-        h, w = np.where(res >= threshold)
-        w = w[0]
-        h = h[0]
-        if 745 < w < 820 and 760 < h < 790:
-            player_p = 0
-        elif 80 < w < 140 and 575 < h < 600:
-            player_p = 1
-        elif 70 < w < 120 and 230 < h < 250:
-            player_p = 2
-        elif 660 < w < 720 and 95 < h < 115:
-            player_p = 3
-        elif 1340 < w < 1390:
-            if 230 < h < 245:
-                player_p = 4
-            elif 575 < h < 590:
-                player_p = 5
-    except Exception as e:
-        pass
-    return player_p
-
-
 def get_money(window):
     numbers_dir = 'numbers'
     money = ''
@@ -155,43 +87,135 @@ def get_money(window):
     return money
 
 
-def get_player_window(full_window, postion):
-    player_window_h = 210
-    player_window_w = 350
-    money_window_h = 70
-    if postion == 0:
-        player_window_h_start = 660
-        player_window_w_start = 620
-    elif postion == 1:
-        player_window_h_start = 460
-        player_window_w_start = 30
-    elif postion == 2:
-        player_window_h_start = 110
-        player_window_w_start = 30
-    elif postion == 3:
-        player_window_h_start = 15
-        player_window_w_start = 620
-    elif postion == 4:
-        player_window_h_start = 120
-        player_window_w_start = 1200
-    elif postion == 5:
-        player_window_h_start = 460
-        player_window_w_start = 1200
-    player_window = full_window[player_window_h_start:player_window_h_start+player_window_h,
-                                player_window_w_start:player_window_w_start+player_window_w]
-    money_window = full_window[player_window_h_start+player_window_h-money_window_h:player_window_h_start+player_window_h,
-                                player_window_w_start:player_window_w_start+player_window_w]
-    return player_window, money_window
-
-
 def get_control_window(full_window):
-    control_window_start_h = 860
-    control_window_h = 320
-    control_window_start_w = 750
-    control_window_w = 820
-    control_window = full_window[control_window_start_h:control_window_start_h+control_window_h,
-                     control_window_start_w:control_window_start_w+control_window_w]
+    control_window_start_x = 145
+    control_window_start_y = 465
+    control_window_w = 510
+    control_window_h = 105
+    control_window = full_window[control_window_start_y:control_window_start_y+control_window_h,
+                     control_window_start_x:control_window_start_x+control_window_w]
     return control_window
+
+
+def get_board_window(full_window):
+    board_window_start_x = 255
+    board_window_start_y = 170
+    board_window_w = 282
+    board_window_h = 49
+    board_window = full_window[board_window_start_y:board_window_start_y + board_window_h,
+                   board_window_start_x:board_window_start_x + board_window_w]
+    return board_window
+
+
+def get_player_window(full_window, postion):
+    if postion == 0:
+        player_window_x = 420
+        player_window_y = 305
+
+        player_window_w = 185
+        player_window_h = 125
+
+    elif postion == 1:
+        player_window_x = 185
+        player_window_y = 305
+
+        player_window_w = 185
+        player_window_h = 125
+
+    elif postion == 3:
+        player_window_x = 185
+        player_window_y = 35
+
+        player_window_w = 180
+        player_window_h = 125
+
+    elif postion == 4:
+        player_window_x = 420
+        player_window_y = 35
+
+        player_window_w = 185
+        player_window_h = 125
+
+    elif postion == 2:
+        player_window_x = 5
+        player_window_y = 185
+
+        player_window_w = 240
+        player_window_h = 85
+
+    elif postion == 5:
+        player_window_x = 550
+        player_window_y = 185
+
+        player_window_w = 240
+        player_window_h = 85
+
+    player_window = full_window[player_window_y:player_window_y+player_window_h,
+                                player_window_x:player_window_x+player_window_w]
+    return player_window
+
+
+def get_position_info(full_window):
+    my_name = cv2.imread('positions/name.png', 0)
+    button = cv2.imread('positions/button.png', 0)
+    card_back = cv2.imread('positions/card_back.png', 0)
+
+    my_position = -1
+    opponent_info = dict()
+    button_position = -1
+
+    # get all 6 player's window
+    for i in range(6):
+        player_window = get_player_window(im, i)
+
+        threshold = 0.7
+        # check if this player is playing now
+        card_back_res = cv2.matchTemplate(player_window, card_back, cv2.TM_CCOEFF_NORMED)
+        h, w = np.where(card_back_res >= threshold)
+        if len(h) > 0 and len(w) > 0:
+            opp_info = dict()
+            opp_money = get_money(player_window)
+            opp_info['money'] = opp_money
+            opponent_info[i] = opp_info
+
+        # check my position
+        my_res = cv2.matchTemplate(player_window, my_name, cv2.TM_CCOEFF_NORMED)
+        h, w = np.where(my_res >= threshold)
+        if len(h) > 0 and len(w) > 0:
+            my_position = i
+            my_money = get_money(player_window)
+
+        # check button position
+        button_res = cv2.matchTemplate(player_window, button, cv2.TM_CCOEFF_NORMED)
+        h, w = np.where(button_res >= threshold)
+        if len(h) > 0 and len(w) > 0:
+            button_position = i
+
+        print('my_p: {}, my_money: {}, button_p: {}, opp_p: {}'.format(my_position, my_money, button_position, opponent_info))
+        return my_position, my_money, button_position, opponent_info
+
+
+def parse_position(my_position, button_position, opponent_info):
+    my_status = None
+
+    all_player_position = list()
+    all_player_position.append(my_position)
+    all_player_position.extend(list(opponent_info.keys))
+    all_player_position.sort()
+    player_nums = len(all_player_position)
+
+
+    for p in all_player_position:
+        p_status = None
+        if button_position == my_position:
+            my_status = 'Button'
+        elif (button_position - my_position) :
+            pass
+
+        if p == my_position:
+            my_status = p_status
+
+    return my_status, opponent_info
 
 
 def control_action(control, click_count=1):
@@ -264,7 +288,7 @@ if __name__ == '__main__':
         control_window = get_control_window(im)
         control_list = get_controls(control_window)
 
-        board_cards_window = im[int(31*h/96):int(39*h/96), int(w/3): int(2*w/3)]
+        board_cards_window = get_board_window(im)
         board_cards = get_card_list(board_cards_window)
 
         if new_hand:
@@ -330,5 +354,3 @@ if __name__ == '__main__':
 
         if len(player_cards) < 2:
             new_hand = True
-
-

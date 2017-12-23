@@ -3,80 +3,111 @@ import cv2
 import os
 
 
-def get_button_postion(full_window):
-    ret, full = cv2.threshold(full_window, 180, 255, cv2.THRESH_BINARY)
-    template = cv2.imread('postion/button.png', 0)
-    res = cv2.matchTemplate(full, template, cv2.TM_CCOEFF_NORMED)
-    threshold = 0.9
-    h, w = np.where(res >= threshold)
-    if 880 < w < 980 and 640 < h < 710:
-        button_p = 0
-    elif 375 < w < 445 and 575 < h < 635:
-        button_p = 1
-    elif 480 < w < 560 and 620 < h < 680:
-        button_p = 1
-    elif 325 < w < 395 and 310 < h < 370:
-        button_p = 2
-    elif 270 < w < 350 and 380 < h < 460:
-        button_p = 2
-    elif 645 < w < 710 and 205 < h < 265:
-        button_p = 3
-    elif 335 < w < 405 and 305 < h < 375:
-        button_p = 3
-    elif 1215 < w < 1285 and 320 < h < 380:
-        button_p = 4
-    elif 545 < w < 615 and 220 < h < 280:
-        button_p = 4
-    elif 1145 < w < 1215 and 575 < h < 635:
-        button_p = 5
-    elif 1000 < w < 1080 and 220 < h < 280:
-        button_p = 5
-    elif 1190 < w < 1260 and 310 < h < 375:
-        button_p = 6
-    elif 1240 < w < 1320 and 380 < h < 450:
-        button_p = 7
-    elif 1050 < w < 1150 and 600 < h < 670:
-        button_p = 8
-    print(button_p)
-    return button_p
+def get_player_window(full_window, postion):
+    # money_window_h = 70
+    if postion == 0:
+        player_window_x = 420
+        player_window_y = 305
+
+        player_window_w = 185
+        player_window_h = 125
+
+    elif postion == 1:
+        player_window_x = 185
+        player_window_y = 305
+
+        player_window_w = 185
+        player_window_h = 125
+
+    elif postion == 3:
+        player_window_x = 185
+        player_window_y = 35
+
+        player_window_w = 180
+        player_window_h = 125
+
+    elif postion == 4:
+        player_window_x = 420
+        player_window_y = 35
+
+        player_window_w = 185
+        player_window_h = 125
+
+    elif postion == 2:
+        player_window_x = 5
+        player_window_y = 185
+
+        player_window_w = 240
+        player_window_h = 85
+
+    elif postion == 5:
+        player_window_x = 550
+        player_window_y = 185
+
+        player_window_w = 240
+        player_window_h = 85
+
+    player_window = full_window[player_window_y:player_window_y+player_window_h,
+                                player_window_x:player_window_x+player_window_w]
+    # money_window = full_window[player_window_h_start+player_window_h-money_window_h:player_window_h_start+player_window_h,
+    #                             player_window_w_start:player_window_w_start+player_window_w]
+    return player_window    #money_window
 
 
-def get_player_postion(full_window):
-    player_p = 0
-    ret, full = cv2.threshold(full_window, 70, 255, cv2.THRESH_BINARY)
-    template = cv2.imread('postion/me.png', 0)
-    res = cv2.matchTemplate(full, template, cv2.TM_CCOEFF_NORMED)
-    threshold = 0.7
-    h, w = np.where(res >= threshold)
-    print(h, w)
-    w = w[0]
-    h = h[0]
-    if 745 < w < 820 and 760 < h < 790:
-        player_p = 0
-    elif 80 < w < 140 and 575 < h < 600:
-        player_p = 1
-    elif 70 < w < 120 and 230 < h < 250:
-        player_p = 2
-    elif 660 < w < 720 and 95 < h < 115:
-        player_p = 3
-    elif 1340 < w < 1390:
-        if 230 < h < 245:
-            player_p = 4
-        elif 575 < h < 590:
-            player_p = 5
-    print(player_p)
-    return player_p
+def get_money(player_window):
+    money = -1
+
+    return money
 
 
 if __name__ == '__main__':
+    my_name = cv2.imread('positions/name.png', 0)
+    button = cv2.imread('positions/button.png', 0)
+    card_back = cv2.imread('positions/card_back.png', 0)
+
     test_imgs = os.listdir('poker')
     for img in test_imgs:
+        play_now = False
+        my_postion = -1
+        opponent_info = dict()
+        button_postion = -1
+        all_seats = dict()
         print(img)
-        if not img.endswith('png'):
+        if not img.endswith('.png'):
             continue
         im = cv2.imread('poker/{}'.format(img), 0)
-        # get_button_postion(im)
-        get_player_postion(im)
+
+        # get all 6 player's window
+        for i in range(6):
+            player_window = get_player_window(im, i)
+            all_seats[i] = player_window
+            # cv2.imshow('p', player_window)
+            # cv2.waitKey(0)
+            # cv2.destroyAllWindows()
+
+            threshold = 0.7
+            # check if this player is playing now
+            card_back_res = cv2.matchTemplate(player_window, card_back, cv2.TM_CCOEFF_NORMED)
+            h, w = np.where(card_back_res >= threshold)
+            if len(h) > 0 and len(w) > 0:
+                opp_money = get_money(player_window)
+                opponent_info[i] = opp_money
+
+            # check my position
+            my_res = cv2.matchTemplate(player_window, my_name, cv2.TM_CCOEFF_NORMED)
+            h, w = np.where(my_res >= threshold)
+            if len(h) > 0 and len(w) > 0:
+                my_postion = i
+                my_money = get_money(player_window)
+
+            # check button position
+            button_res = cv2.matchTemplate(player_window, button, cv2.TM_CCOEFF_NORMED)
+            h, w = np.where(button_res >= threshold)
+            if len(h) > 0 and len(w) > 0:
+                button_postion = i
+
+        print('my_p: {}, button_p: {}, opp_p: {}'.format(my_postion, button_postion, opponent_info))
+
         # ret, im = cv2.threshold(im, 80, 255, cv2.THRESH_BINARY)
         cv2.imshow('card_window', im)
         cv2.waitKey(0)
