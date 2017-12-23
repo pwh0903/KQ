@@ -11,7 +11,7 @@ while True:
     # os.system("screencapture -R 0,46,791,548 {}".format(screenshot))
 
     # for my mac
-    os.system("screencapture -R 0,22,794,591 {}".format(screenshot))
+    os.system("screencapture -R 0,22,1098,799 {}".format(screenshot))
     im = cv2.imread(screenshot, 0)
     cv2.imwrite('poker/{}.png'.format(count), im)
     count += 1

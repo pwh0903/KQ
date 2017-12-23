@@ -196,6 +196,7 @@ def get_position_info(full_window):
 
 
 def parse_position(my_position, button_position, opponent_info):
+    # this part not ready now
     my_status = None
 
     all_player_position = list()
@@ -204,16 +205,20 @@ def parse_position(my_position, button_position, opponent_info):
     all_player_position.sort()
     player_nums = len(all_player_position)
 
-
-    for p in all_player_position:
-        p_status = None
-        if button_position == my_position:
+    if button_position in all_player_position and player_nums == 6:
+        me_button = button_position - my_position
+        if me_button == 0:
             my_status = 'Button'
-        elif (button_position - my_position) :
-            pass
-
-        if p == my_position:
-            my_status = p_status
+        elif me_button == 1:
+            my_status = 'CO'
+        elif me_button == 2:
+            my_status = 'LP'
+        elif me_button == 3:
+            my_status == 'Middle'
+        elif me_button == 4:
+            my_status = 'Big_Blind'
+        elif me_button == 5:
+            my_status = 'Small_Blind'
 
     return my_status, opponent_info
 
