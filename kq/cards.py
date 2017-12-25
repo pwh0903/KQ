@@ -8,12 +8,12 @@ def get_card_list(cards_window):
     cards_folder = 'cards'
     imgs = os.listdir(cards_folder)
     for img in imgs:
-        if not img.endswith('.PNG'):
+        if not img.endswith('.png'):
             continue
         file_name, file_extension = os.path.splitext(img)
         template = cv2.imread('{}/{}'.format(cards_folder, img), 0)
         res = cv2.matchTemplate(cards_window, template, cv2.TM_CCOEFF_NORMED)
-        threshold = 0.99
+        threshold = 0.95
         loc = np.where(res >= threshold)
         row, col = loc
         if len(row) > 0 and len(col) > 0:
@@ -25,6 +25,7 @@ def get_card_list(cards_window):
                     continue
                 start_c = c
             cards_list.append(file_name)
+    print(cards_list)
     return cards_list
 
 
@@ -35,16 +36,14 @@ if __name__ == '__main__':
         if not img.endswith('png'):
             continue
         im = cv2.imread('poker/{}'.format(img), 0)
-        h, w = im.shape
-        # pool_window = im
-        board_window_start_x = 255
-        board_window_start_y = 170
-        board_window_w = 282
-        board_window_h = 49
-        board_window = im[board_window_start_y:board_window_start_y+board_window_h,
-                          board_window_start_x:board_window_start_x+board_window_w]
-        card_list = get_card_list(board_window)
-        print(card_list)
+        board_window_start_x = 770
+        board_window_start_y = 480
+        board_window_end_x = 1560
+        board_window_end_y = 590
+        board_window = im[board_window_start_y:board_window_end_y,
+                          board_window_start_x:board_window_end_x]
+        cards_list = get_card_list(board_window)
+        # print(card_list)
         cv2.imshow('b', board_window)
         cv2.waitKey(0)
         cv2.destroyAllWindows()

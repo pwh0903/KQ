@@ -68,12 +68,12 @@ if __name__ == '__main__':
         if not img.endswith('.png'):
             continue
         im = cv2.imread('poker/{}'.format(img), 0)
-        option_start_x = 145
-        option_start_y = 465
-        option_w = 510
-        option_h = 105
-        control_window = im[option_start_y:option_start_y+option_h, option_start_x:option_start_x+option_w]
-        ret, control_window = cv2.threshold(control_window, 95, 255, cv2.THRESH_BINARY)
+        control_start_x = 140
+        control_start_y = 1370
+        control_end_x = 1930
+        control_end_y = 1650
+        control_window = im[control_start_y:control_end_y, control_start_x:control_end_x]
+        # ret, control_window = cv2.threshold(control_window, 95, 255, cv2.THRESH_BINARY)
         option_list = get_options(control_window)
         print(option_list)
         cv2.imshow('option_window', control_window)

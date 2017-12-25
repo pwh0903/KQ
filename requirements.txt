@@ -1,8 +1,10 @@
 appnope==0.1.0
+cycler==0.10.0
 decorator==4.1.2
 ipython==6.2.1
 ipython-genutils==0.2.0
 jedi==0.11.1
+matplotlib==2.1.1
 numpy==1.13.3
 olefile==0.44
 parso==0.1.1
@@ -96,8 +98,11 @@ pyobjc-framework-SyncServices==4.1
 pyobjc-framework-SystemConfiguration==4.1
 pyobjc-framework-Vision==4.1
 pyobjc-framework-WebKit==4.1
+pyparsing==2.2.0
 PyScreeze==0.1.13
+python-dateutil==2.6.1
 PyTweening==1.0.3
+pytz==2017.3
 simplegeneric==0.8.1
 six==1.11.0
 traitlets==4.3.2

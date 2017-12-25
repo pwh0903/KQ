@@ -3,22 +3,22 @@ import cv2
 import numpy as np
 
 
-def get_nums(num_window):
+def get_board_money(board_window):
+    dot_name = 'dot'
+    img_folder = 'pot_number'
     nums_list = dict()
-    imgs = os.listdir('p_n')
+    imgs = os.listdir(img_folder)
     for img in imgs:
-        if not img.endswith('png'):
+        if not img.endswith('.png'):
             continue
         file_name, file_extension = os.path.splitext(img)
-        template = cv2.imread('p_n/{}'.format(img), 0)
-        res = cv2.matchTemplate(num_window, template, cv2.TM_CCOEFF_NORMED)
-        threshold = 0.88
+        template = cv2.imread('{}/{}'.format(img_folder, img), 0)
+        res = cv2.matchTemplate(board_window, template, cv2.TM_CCOEFF_NORMED)
+        threshold = 0.95
         loc = np.where(res >= threshold)
         row, col = loc
         if len(row) > 0 and len(col) > 0:
             start_c = 0
-            print(file_name)
-            print(col)
             for c in col:
                 diff_c = c - start_c
                 if diff_c < 5:
@@ -29,31 +29,45 @@ def get_nums(num_window):
     num_position = [p for p in nums_list]
     num_position.sort()
     parsed_number = ''
+
+    # find dot position in numbers
+    find_dot = False
+    count = 0
+    for p in num_position[::-1]:
+        if nums_list[p] == dot_name:
+            find_dot = True
+            continue
+        if not find_dot:
+            count += 1
+
     for p in num_position:
-        if nums_list[p] in ['comma', 'dot']:
+        if nums_list[p] == dot_name:
             continue
         parsed_number += nums_list[p]
     try:
-        parsed_number = float(parsed_number)
+        if find_dot:
+            parsed_number = float(parsed_number) / 10 ** count
+        else:
+            parsed_number = float(parsed_number)
     except Exception as e:
         parsed_number = None
     return parsed_number
 
 
 if __name__ == '__main__':
-    x = 315
-    y = 155
-    w = 160
-    h = 13
+    x = 1000
+    y = 435
+    end_x = 1360
+    end_y = 475
     test_imgs = os.listdir('poker')
     for img in test_imgs:
         print(img)
         if not img.endswith('png'):
             continue
         im = cv2.imread('poker/{}'.format(img), 0)
-        pot_window = im[y:y+h, x:x+w]
+        pot_window = im[y:end_y, x:end_x]
         # ret, pot_window = cv2.threshold(pot_window, 160, 255, cv2.THRESH_BINARY)
-        nums = get_nums(pot_window)
+        nums = get_board_money(pot_window)
         print(nums)
         cv2.imshow('option_window', pot_window)
         cv2.waitKey(0)

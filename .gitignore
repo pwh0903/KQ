@@ -2,11 +2,6 @@ poker/*
 env/*
 .DS_Store
 .idea/*
-controls/*
-numbers/*
-postion/*
-cards/*
 *.pyc
 tmp/*
-positions/
 tmp_screenshot.png
