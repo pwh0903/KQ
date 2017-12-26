@@ -1,9 +1,6 @@
-import cv2
-import subprocess
-import os
 import time
 
-from kq.decision import check_if_turn2move, get_board_info, get_board_status, check_should_call
+from kq.decision import check_if_turn2move, get_board_info, get_board_status, check_should_call, check_card_equity
 from kq.window_utils import get_full_game_window
 from kq.position_utils import get_position_info
 from kq.control_utils import get_controls
@@ -97,10 +94,7 @@ if __name__ == '__main__':
         print('My cards: {}'.format(my_cards))
         if len(board_cards) > 1:
             board_cards_str = ''.join(board_cards)
-            output = subprocess.check_output('ps-eval {} --board {}'.format(my_cards_str, board_cards_str), shell=True)
-            output = output.decode('utf-8')
-            my_win = float(output.split('\n')[0].split('%')[0].strip().split(' ')[-1])
-            my_lose = float(output.split('\n')[1].split('%')[0].strip().split(' ')[-1])
+            my_win, my_lose = check_card_equity(my_cards_str, board_cards_str)
             money_this_hand = my_money_last_hand - my_money
             should_call = check_should_call(my_win, my_lose, pot_money, call_money)
             print('My winning percentage: {}'.format(my_win))
