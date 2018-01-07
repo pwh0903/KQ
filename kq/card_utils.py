@@ -9,7 +9,7 @@ def get_card_list(cards_window):
     :return: card list ['As', 'Ac']
     """
     cards_list = []
-    cards_folder = 'cards'
+    cards_folder = '../cards'
     imgs = os.listdir(cards_folder)
     for img in imgs:
         if not img.endswith('.png'):

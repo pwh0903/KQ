@@ -3,23 +3,20 @@ import cv2
 import os
 import numpy as np
 
-from kq.window_utils import get_control_window
 
-
-def get_controls(full_window):
+def get_controls(control_window):
     """
-    :param full_window:
+    :param control_window:
     :return: control list
     """
-    control_window = get_control_window(full_window)
-
+    control_dir = '../controls'
     control_list = []
-    imgs = os.listdir('controls')
+    imgs = os.listdir(control_dir)
     for img in imgs:
         if not img.endswith('png'):
             continue
         file_name, file_extension = os.path.splitext(img)
-        template = cv2.imread('controls/{}'.format(img), 0)
+        template = cv2.imread('{}/{}'.format(control_dir, img), 0)
         res = cv2.matchTemplate(control_window, template, cv2.TM_CCOEFF_NORMED)
         threshold = 0.8
         loc = np.where(res >= threshold)

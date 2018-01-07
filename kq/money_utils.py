@@ -11,7 +11,7 @@ def get_pot_money(pot_money_window):
     :return: pot money
     """
     dot_name = 'dot'
-    img_folder = 'pot_number'
+    img_folder = '../pot_number'
     nums_list = dict()
     pot_money = -1
     imgs = os.listdir(img_folder)
@@ -61,15 +61,14 @@ def get_pot_money(pot_money_window):
     return pot_money
 
 
-def get_player_money(full_window):
+def get_player_money(player_window):
     """
-    :param full_window:
+    :param player_window:
     :return: player money
     """
-    player_window = get_player_window(full_window)
     player_money = -1
     dot_name = 'dot'
-    img_folder = 'player_money_number'
+    img_folder = '../player_money_number'
     nums_list = dict()
     imgs = os.listdir(img_folder)
     for img in imgs:

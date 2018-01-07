@@ -17,8 +17,8 @@ def get_control_window(full_window):
     control_start_y = 1370
     control_end_x = 1930
     control_end_y = 1650
-    control_window = full_window[control_start_y:control_end_y, control_start_x:control_end_x]
-    return control_window
+    c_window = full_window[control_start_y:control_end_y, control_start_x:control_end_x]
+    return c_window
 
 
 def get_board_window(full_window):
@@ -42,6 +42,10 @@ def get_pot_money_window(full_window):
 
 
 def get_player_window(full_window, position):
+    player_window_start_x = 0
+    player_window_start_y = 0
+    player_window_end_x = 0
+    player_window_end_y = 0
     if position == 0:
         player_window_start_x = 1240
         player_window_start_y = 880

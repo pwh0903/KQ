@@ -11,9 +11,10 @@ def get_position_info(full_window):
     :param full_window:
     :return: my_position, my_cards, my_money, button_position, opponent_info
     """
-    my_name = cv2.imread('positions/name.png', 0)
-    button = cv2.imread('positions/button.png', 0)
-    card_back = cv2.imread('positions/card_back.png', 0)
+    positions_dir = '../positions'
+    my_name = cv2.imread('{}/name.png'.format(positions_dir), 0)
+    button = cv2.imread('{}/button.png'.format(positions_dir), 0)
+    card_back = cv2.imread('{}/card_back.png'.format(positions_dir), 0)
 
     my_position = -1
     my_cards = list()
