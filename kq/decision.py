@@ -12,7 +12,7 @@ def check_if_turn2move(full_window):
     player_control_list = get_controls(player_control_window)
     if len(player_control_list) > 1:
         turn2move = True
-    return turn2move
+    return turn2move, player_control_list
 
 
 def check_should_call(my_win, my_lose, pot_money, money_this_hand, call_money=0):
