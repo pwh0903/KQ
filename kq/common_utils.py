@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 import time
 import os
+import logging
 
 
 def cut_blank(im):
@@ -56,3 +57,15 @@ def take_screenshot():
         count += 2
         time.sleep(4)
 
+
+def get_logger():
+    logger = logging.getLogger()
+    ch = logging.StreamHandler()
+    fh = logging.FileHandler('../holdem.log')
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    fh.setFormatter(formatter)
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(fh)
+    logger.addHandler(ch)
+    return logger

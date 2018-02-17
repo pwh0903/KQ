@@ -3,5 +3,6 @@ env/*
 .DS_Store
 .idea/*
 *.pyc
+*.log
 tmp/*
 tmp_screenshot.png
