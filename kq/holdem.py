@@ -1,4 +1,5 @@
 import time
+import random
 
 from kq.decision import get_board_info, get_board_status, check_should_call, check_card_equity
 from kq.window_utils import get_full_game_window, get_control_window
@@ -10,18 +11,19 @@ from kq.control_utils import get_controls
 
 def main(bb, buy_in):
     log = get_logger()
-    log.info('Start new game...')
 
     # init game status
-    total_hand = 0
-    win_hand = 0
-    lose_hand = 0
-    equal_hand = 0
+    total_hands = 0
+    win_hands = 0
+    lose_hands = 0
+    equal_hands = 0
 
     # money status
     my_money_last_hand = buy_in
     bb_count = buy_in // bb
     my_profit = 0
+
+    log.info('Start new game, buy in: {}, big blind: {}, total bbs: {}'.format(buy_in, bb, bb_count))
 
     # some tags, used to check if this hand is new hand
     new_hand = True
@@ -60,7 +62,7 @@ def main(bb, buy_in):
         if my_cards_last_hand != my_cards_str and button_position != button_position_last_hand:
             if my_cards_last_hand:
                 new_hand = True
-                total_hand += 1
+                total_hands += 1
 
         # get board money, board cards
         board_cards, pot_money = get_board_info(full_game_window)
@@ -74,18 +76,24 @@ def main(bb, buy_in):
 
         # save my new hand start status for new hand
         if new_hand:
-            if total_hand != 0:
+            if total_hands != 0:
                 my_money_last_hand = my_money
                 my_profit = my_money - buy_in
                 win_lose = my_money - my_money_last_hand
                 if win_lose < 0:
-                    lose_hand += 1
+                    lose_hands += 1
                 elif win_lose > 0:
-                    win_hand += 1
+                    win_hands += 1
                 else:
-                    equal_hand += 1
-            log.info('==========Total Hand {}, win: {}, lose: {},equal: {}, profit: {}=========='.format(total_hand, win_hand, lose_hand, equal_hand, my_profit))
-            log.info('Player in position {}'.format(my_position))
+                    equal_hands += 1
+            log.info('===============Game Statistic===============')
+            log.info('Total Hands: {}'.format(total_hands))
+            log.info('Win Hands: {}'.format(win_hands))
+            log.info('Lose Hands: {}'.format(lose_hands))
+            log.info('Equal Hands: {}'.format(equal_hands))
+            log.info('Profit: {}'.format(my_profit))
+            log.info('============================================')
+            log.info('Player in position: {}'.format(my_position))
             # save this hand's info as history, set new hand false
             my_cards_last_hand = my_cards_str
             new_hand = False
@@ -101,6 +109,7 @@ def main(bb, buy_in):
             log.info('My winning percentage: {}'.format(my_win))
             log.info('Call money: {}'.format(call_money))
             log.info('Should Call: {}'.format(should_call))
+        log.info('===============================')
         # print('Pot money: {}'.format(pot_money))
         # print('My money: {}'.format(my_money))
         # print('Available controls: {}'.format(control_list))

@@ -59,9 +59,15 @@ def take_screenshot():
 
 
 def get_logger():
+    """
+    create logger instance
+    :return: logger
+    """
     logger = logging.getLogger()
     ch = logging.StreamHandler()
-    fh = logging.FileHandler('../holdem.log')
+    fh = logging.FileHandler('../holdem.log', 'a')
+    ch.setLevel(logging.DEBUG)
+    fh.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     ch.setFormatter(formatter)
     fh.setFormatter(formatter)
